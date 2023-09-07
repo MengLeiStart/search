@@ -7,7 +7,17 @@ namespace 路径
     public partial class Form : System.Windows.Forms.Form
     {
         Menus root;
+        Menus son;
+        Menus grandSon;
         string result = "";
+        //左括号出现次数
+        int left = 0;
+        //右括号出现次数
+        int right = 0;
+        int floor;
+
+
+
         public Form()
         {
             InitializeComponent();
@@ -16,6 +26,7 @@ namespace 路径
         //节点
         public class Menus
         {
+            
             public string Name { get; set; }
             public Menus Parent { get; set; }
             public List<Menus> SubMenus { get; set; }
@@ -27,6 +38,7 @@ namespace 路径
         }
         public Menus BuildMenu(string txt)
         {
+            
             //把需要用来分割得符号放入数组
             string[] str = { "(", ")", "," };
             //这里用于分割字符串但是分割完后保留分割符
@@ -34,34 +46,44 @@ namespace 路径
             {
                 //把每一个分割符前后加上@符号用于后续保留分隔符
                 txt = txt.Replace(str[i], "@" + str[i] + "@");
-            }
-            string[] parts = txt.Split(new char[] { '@', ',' }, StringSplitOptions.RemoveEmptyEntries);
-            //创建根节点
-            root = new Menus(parts[0]);
-            //根节点没有父节点
-            root.Parent = null;
-            for (int i = 2; i < parts.Length - 1; i++)
-            {              
-               Menus son = new Menus(parts[i]);
-               son.Parent = root;
-               root.SubMenus.Add(son);
-               if (parts[i + 1] == "(")
-               {
-                   for (int j = i + 2; j < parts.Length; j++)
-                   {
-                  
-                       if (parts[j] == ")")
-                       {
-                           i = j;
-                           break;
-                       }
-                       Menus grandSon = new Menus(parts[j]);
-                       grandSon.Parent = son;
-                       son.SubMenus.Add(grandSon);
-                   }
-               }                
+            }           
+            string[] parts = txt.Split(new char[] { '@', ',' }, StringSplitOptions.RemoveEmptyEntries);         
+            for (int i = 0; i < parts.Length; i++)
+            {
+                if (parts[i] == "(")
+                {
+                    left++;
+                    //用左边括号减去右边括号出现次数，结果为节点所在层数
+                    floor = left - right;
+                    continue;
+                }
+                else if (parts[i] == ")")
+                {
+                    right++;
+                    //用左边括号减去右边括号出现次数，结果为节点所在层数
+                    floor = left - right;
+                }  
+                else {
+                    if (floor == 0)
+                    {
+                        root = new Menus(parts[i]);
+                        root.Parent = null;
+                    }
+                    else if (floor == 1)
+                    {
+                        son = new Menus(parts[i]);
+                        son.Parent = root;
+                        root.SubMenus.Add(son);
+                    }
+                    else if (floor == 2) {
+                        grandSon = new Menus(parts[i]);
+                        grandSon.Parent = son;
+                        son.SubMenus.Add(grandSon);
+                    }
+                }                       
             }
             return root;
+
         }
         string GetPath(string name, Menus menu)
         {
