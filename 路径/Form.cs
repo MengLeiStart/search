@@ -15,9 +15,6 @@ namespace 路径
         //右括号出现次数
         int right = 0;
         int floor;
-
-
-
         public Form()
         {
             InitializeComponent();
@@ -26,7 +23,6 @@ namespace 路径
         //节点
         public class Menus
         {
-            
             public string Name { get; set; }
             public Menus Parent { get; set; }
             public List<Menus> SubMenus { get; set; }
@@ -37,8 +33,7 @@ namespace 路径
             }
         }
         public Menus BuildMenu(string txt)
-        {
-            
+        {            
             //把需要用来分割得符号放入数组
             string[] str = { "(", ")", "," };
             //这里用于分割字符串但是分割完后保留分割符
@@ -47,8 +42,34 @@ namespace 路径
                 //把每一个分割符前后加上@符号用于后续保留分隔符
                 txt = txt.Replace(str[i], "@" + str[i] + "@");
             }           
-            string[] parts = txt.Split(new char[] { '@', ',' }, StringSplitOptions.RemoveEmptyEntries);         
-            for (int i = 0; i < parts.Length; i++)
+            string[] parts = txt.Split(new char[] { '@', ',' }, StringSplitOptions.RemoveEmptyEntries);
+            
+            for (int i = 0; i < parts.Length; i++) {
+                if (parts[i] == "(")
+                {
+                    root = son;
+                }
+                else if (parts[i] == ")")
+                    
+                {   if (i == parts.Length - 1)
+                    {
+                        
+                    }
+                    else {
+                        root = root.Parent;
+                    }                 
+                    
+                }
+                else { 
+                    son = new Menus(parts[i]);
+                    if(root != null)
+                    {
+                     son.Parent = root;
+                     root.SubMenus.Add(son);
+                    }                    
+                }
+            }
+            /*for (int i = 0; i < parts.Length; i++)
             {
                 if (parts[i] == "(")
                 {
@@ -81,7 +102,7 @@ namespace 路径
                         son.SubMenus.Add(grandSon);
                     }
                 }                       
-            }
+            }*/
             return root;
 
         }
