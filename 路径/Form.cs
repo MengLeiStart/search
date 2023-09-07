@@ -8,17 +8,10 @@ namespace 路径
     {
         Menus root;
         Menus son;
-        Menus grandSon;
         string result = "";
-        //左括号出现次数
-        int left = 0;
-        //右括号出现次数
-        int right = 0;
-        int floor;
         public Form()
         {
             InitializeComponent();
-
         }
         //节点
         public class Menus
@@ -42,25 +35,28 @@ namespace 路径
                 //把每一个分割符前后加上@符号用于后续保留分隔符
                 txt = txt.Replace(str[i], "@" + str[i] + "@");
             }           
-            string[] parts = txt.Split(new char[] { '@', ',' }, StringSplitOptions.RemoveEmptyEntries);
-            
+            string[] parts = txt.Split(new char[] { '@', ',' }, StringSplitOptions.RemoveEmptyEntries);            
             for (int i = 0; i < parts.Length; i++) {
+                //遇到做括号说明节点带有子节点
+                //这时候就需要将自己本身提为父节点
                 if (parts[i] == "(")
                 {
                     root = son;
                 }
-                else if (parts[i] == ")")
-                    
-                {   if (i == parts.Length - 1)
-                    {
-                        
-                    }
+                //遇到右括号说明整层的子节点已经添加完毕
+                //这时候需要将父节点变为子节点，父节点的父节点变为父节点
+                else if (parts[i] == ")")                   
+                {   //如果到了最后一个元素，
+                    //此时已经将根节点赋值给root
+                    //不需要再触发将root节点的父节点赋值给root
+                    if (i == parts.Length - 1){}  
                     else {
+                        //将父节点的父节点变为父节点
                         root = root.Parent;
-                    }                 
-                    
+                    }                                     
                 }
                 else { 
+                    //创建节点
                     son = new Menus(parts[i]);
                     if(root != null)
                     {
@@ -69,91 +65,38 @@ namespace 路径
                     }                    
                 }
             }
-            /*for (int i = 0; i < parts.Length; i++)
-            {
-                if (parts[i] == "(")
-                {
-                    left++;
-                    //用左边括号减去右边括号出现次数，结果为节点所在层数
-                    floor = left - right;
-                    continue;
-                }
-                else if (parts[i] == ")")
-                {
-                    right++;
-                    //用左边括号减去右边括号出现次数，结果为节点所在层数
-                    floor = left - right;
-                }  
-                else {
-                    if (floor == 0)
-                    {
-                        root = new Menus(parts[i]);
-                        root.Parent = null;
-                    }
-                    else if (floor == 1)
-                    {
-                        son = new Menus(parts[i]);
-                        son.Parent = root;
-                        root.SubMenus.Add(son);
-                    }
-                    else if (floor == 2) {
-                        grandSon = new Menus(parts[i]);
-                        grandSon.Parent = son;
-                        son.SubMenus.Add(grandSon);
-                    }
-                }                       
-            }*/
             return root;
-
         }
         string GetPath(string name, Menus menu)
         {
-            //如果是根节点直接返回名字
-            if (name == menu.Name)
+            if (menu.Name.Equals(name))
             {
                 result += menu.Name;
-                return result;
-            }
-            else
-            {
-                //遍历根节点的子节点
-                foreach (var tmp in menu.SubMenus)
-                {
-                    if (!result.Equals("")) {
-                        break;
-                    }
-                    if (tmp.Name == name)
-                    {                      
-                        if (menu.Parent != null)
-                        {
-                            //返回孙子节点得查找路径
-                            result += menu.Parent.Name+"->"+ menu.Name + "->" + tmp.Name;
-                            return result;
-                        }
-                        else {
-                            //返回子节点得查找路径
-                            result +=  menu.Name + "->" + tmp.Name;
-                            return result;
-                        }                       
-                    }
-                    else
-                    {
-                        //判断根节点的子节点有无子节点
-                        if (tmp.SubMenus.Count > 0)
-                        {                       
-                            //如果有子节点进行递归
-                            result = GetPath(name, tmp);
-                        }
-                    }
+                while (menu.Parent != null) { 
+                    result = menu.Parent.Name + "->" + result;
+                    menu = menu.Parent;
                 }
-                //返回查找结果
                 return result;
             }
+            else {
+                if (menu.SubMenus.Count > 0) { 
+                    foreach (var tmp in menu.SubMenus)
+                    {
+                        GetPath(name, tmp);
+                        if (result.Length > 1) {
+                            break;
+                        }
+                    }
+                }                
+            }
+            return result;
         }
         private void bt_Search_Click(object sender, EventArgs e)
         {
             //每次搜索前清空路径值
             result = "";
+            root = null;
+            son = null;
             Menus rot = BuildMenu("Root(MenuA(SA1,SA2),MenuB(LB1,LB2,LB3),MenuC)");
             string name = txt_Input.Text;
             string pathText = GetPath(name, rot);
