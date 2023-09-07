@@ -1,0 +1,11 @@
+D:\Teach\路径\路径\bin\Debug\路径.exe.config
+D:\Teach\路径\路径\bin\Debug\路径.exe
+D:\Teach\路径\路径\bin\Debug\路径.pdb
+D:\Teach\路径\路径\obj\Debug\路径.csproj.AssemblyReference.cache
+D:\Teach\路径\路径\obj\Debug\路径.csproj.SuggestedBindingRedirects.cache
+D:\Teach\路径\路径\obj\Debug\路径.Form.resources
+D:\Teach\路径\路径\obj\Debug\路径.Properties.Resources.resources
+D:\Teach\路径\路径\obj\Debug\路径.csproj.GenerateResource.cache
+D:\Teach\路径\路径\obj\Debug\路径.csproj.CoreCompileInputs.cache
+D:\Teach\路径\路径\obj\Debug\路径.exe
+D:\Teach\路径\路径\obj\Debug\路径.pdb
